@@ -1,0 +1,16 @@
+GET http://localhost:5134/auth
+
+
+###
+
+GET http://localhost:5134/auth/66d8b02115f4425c28ce4659
+###
+
+POST http://localhost:5134/auth
+Content-Type: application/json
+
+{
+    "username": "Alex12wqew5",
+    "password": "123456789Ab$"
+}
+
