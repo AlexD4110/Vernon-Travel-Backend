@@ -14,7 +14,7 @@ app.use(express.json());
 
 // CORS configuration
 const corsOptions = {
-   origin: process.env.FRONTEND_URL || 'http://localhost:5173',  // Use the FRONTEND_URL from .env
+   origin: process.env.NODE_ENV === 'production' ? 'https://vernontravellbasketball.org' : 'http://localhost:5173',
    credentials: true,                 // Allow credentials (cookies, authorization headers, etc.)
 };
 app.use(cors(corsOptions));
