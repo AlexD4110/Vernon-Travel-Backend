@@ -9,7 +9,7 @@ const rateLimit = require('express-rate-limit');
 // Initialize Express app
 const app = express();
 
-// Use JSON parser middleware
+// Use JSON parser middleware required for body parsing
 app.use(express.json());
 
 // CORS configuration
