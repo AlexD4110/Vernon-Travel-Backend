@@ -1,84 +1,121 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-
+const Player = require('../models/player'); 
 const router = express.Router();
 
-//Getting all routers
-
-
+// Get all registered players
 router.get('/', async (req, res) => {
   try {
-    
-    const users = await User.find(); //Gets all the users
-    res.json(users);
-  } catch (err) { //catches the error
-    res.status(500).json({message: err.message});
+    const players = await Player.find(); // Gets all the registered players
+    res.json(players);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
-//Getting one 
-router.get('/:id', getUser,(req, res) => {
-  res.json(res.user);
+
+// Get one player by ID
+router.get('/:id', getPlayer, (req, res) => {
+  res.json(res.player);
 });
 
-// Register (Create) a new user
+// Register (Create) a new player
 router.post('/register', async (req, res) => {
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const user = new User({
-      username: req.body.username,
-      password: hashedPassword
+    
+    const player = new Player({
+      playerFirstName: req.body.playerFirstName,
+      playerLastName: req.body.playerLastName,
+      parentName: req.body.parentName,
+      email: req.body.email,
+      gradeLevel: req.body.gradeLevel,
+      phone: req.body.phone,
+      gender: req.body.gender,
+      address: {
+        street: req.body.street,
+        town: req.body.town,
+        state: req.body.state,
+        zip: req.body.zip
+      },
+      emergencyContact: req.body.emergencyContact,
     });
-    const newUser = await user.save();
-    res.status(201).json(newUser);
+    
+    const newPlayer = await player.save();
+    res.status(201).json(newPlayer);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 });
 
-//Updating one
-
-router.patch('/', getUser, async (req, res) => {
-  if (req.body.username != null) {
-    res.user.username = req.body.username;
+// Update player details
+router.patch('/:id', getPlayer, async (req, res) => {
+  if (req.body.playerFirstName != null) {
+    res.player.playerFirstName = req.body.playerFirstName;
   }
-  if (req.body.password != null) {
-    res.user.password = req.body.password;
+  if (req.body.playerLastName != null) {
+    res.player.playerLastName = req.body.playerLastName;
   }
+  if (req.body.parentName != null) {
+    res.player.parentName = req.body.parentName;
+  }
+  if (req.body.email != null) {
+    res.player.email = req.body.email;
+  }
+  if (req.body.gradeLevel != null) {
+    res.player.gradeLevel = req.body.gradeLevel;
+  }
+  if (req.body.phone != null) {
+    res.player.phone = req.body.phone;
+  }
+  if (req.body.gender != null) {
+    res.player.gender = req.body.gender;
+  }
+  if (req.body.street != null) {
+    res.player.address.street = req.body.street;
+  }
+  if (req.body.town != null) {
+    res.player.address.town = req.body.town;
+  }
+  if (req.body.state != null) {
+    res.player.address.state = req.body.state;
+  }
+  if (req.body.zip != null) {
+    res.player.address.zip = req.body.zip;
+  }
+  if (req.body.emergencyContact != null) {
+    res.player.emergencyContact = req.body.emergencyContact;
+  }
+  
   try {
-    updatedUser = await res.user.save();
-    res.json(updatedUser);
+    const updatedPlayer = await res.player.save();
+    res.json(updatedPlayer);
   } catch (err) {
-    res.status(400).json({message: err.message}); //something wrong with user data on server error
+    res.status(400).json({ message: err.message });
   }
-})
+});
 
-//delete
-router.delete('/:id', getUser, async (req, res) => {
+// Delete a player
+router.delete('/:id', getPlayer, async (req, res) => {
   try {
-    await res.user.remove();
-    res.json({message: 'Deleted user'});
+    await res.player.remove();
+    res.json({ message: 'Deleted Player' });
   } catch (err) {
-    res.status(500).json({message: err.message}); //server error
+    res.status(500).json({ message: err.message });
   }
-})
+});
 
-//middleware
-
-async function getUser(req, res, next) {
-  let user;
+// Middleware to get player by ID
+async function getPlayer(req, res, next) {
+  let player;
   try {
-     user = await User.findById(req.params.id);
-    if (user == null) {
-      return res.status(404).json({message: 'Cannot find user'});
+    player = await Player.findById(req.params.id);
+    if (player == null) {
+      return res.status(404).json({ message: 'Cannot find player' });
     }
-    res.user = user;
-  } catch(err) {
-    return res.status(500).json({message: err.message}); //server error
+    res.player = player;
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
-  res.user = user;
-  next(); //success to next middleware or request
+  next();
 }
 
 module.exports = router;

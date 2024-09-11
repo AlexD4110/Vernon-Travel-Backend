@@ -10,7 +10,22 @@ POST http://localhost:5134/auth
 Content-Type: application/json
 
 {
-    "username": "Alex12wqew5",
+    "username": "Alex12wqew523433",
     "password": "123456789Ab$"
 }
 
+###
+GET http://localhost:5134/contact
+
+
+###
+
+POST http://localhost:5134/contact
+Content-Type: application/json
+
+{
+  "name": "Alex Deane",
+  "email": "alex@example.com",
+  "subject": "Test Contact Form",
+  "message": "This is a test message from the contact form."
+}
