@@ -15,7 +15,7 @@ app.use(express.json());
 // CORS configuration
 const corsOptions = {
    origin: process.env.NODE_ENV === 'production' ? 'https://vernontravellbasketball.org' : 'http://localhost:5173',
-   credentials: true,                 // Allow credentials (cookies, authorization headers, etc.)
+   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 app.use(cors(corsOptions));
 
@@ -29,7 +29,7 @@ app.use(helmet({
        objectSrc: ["'none'"], // Disallow Flash, etc.
      },
    },
- }));
+}));
 
 // Enforce HTTPS only in production
 if (process.env.NODE_ENV === 'production') {
@@ -38,6 +38,9 @@ if (process.env.NODE_ENV === 'production') {
 } else {
    console.log('Running in development mode');
 }
+
+// Set trust proxy
+app.set('trust proxy', 1); // Trust first proxy
 
 // Rate limiting to prevent brute-force attacks
 const limiter = rateLimit({
@@ -48,8 +51,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI, {
-})
+mongoose.connect(process.env.MONGO_URI, {})
    .then(() => console.log('MongoDB connected'))
    .catch(err => console.log('MongoDB connection error:', err.message)); // Add better error logging
 
@@ -57,9 +59,9 @@ mongoose.connect(process.env.MONGO_URI, {
 const authRoutes = require('./routes/auth');
 app.use('/auth', authRoutes);
 
-// Start the Server
+// Start the Server and listen on the defined PORT
 const PORT = process.env.PORT || 5134;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
    console.log(`Server running on port ${PORT}`);
 });
 
