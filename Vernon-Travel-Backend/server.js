@@ -14,13 +14,22 @@ app.use(express.json());
 
 // CORS configuration
 const corsOptions = {
-   origin: process.env.NODE_ENV === 'production' ? 'https://vernontravellbasketball.org' : 'http://localhost:5173', // Production or localhost
-   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+   origin: process.env.FRONTEND_URL || 'http://localhost:5173',  // Use the FRONTEND_URL from .env
+   credentials: true,                 // Allow credentials (cookies, authorization headers, etc.)
 };
 app.use(cors(corsOptions));
 
 // Security: Helmet to set various HTTP headers for protection
-app.use(helmet());
+app.use(helmet({
+   contentSecurityPolicy: {
+     directives: {
+       defaultSrc: ["'self'"],
+       imgSrc: ["'self'", 'https:'], // Allow images to load from your domain and https sources
+       scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts (if necessary, be careful with this)
+       objectSrc: ["'none'"], // Disallow Flash, etc.
+     },
+   },
+ }));
 
 // Enforce HTTPS only in production
 if (process.env.NODE_ENV === 'production') {
