@@ -5,7 +5,7 @@ const playerSchema = new Schema({
     playerFirstName: { type: String, required: true },
     playerLastName: { type: String, required: true },
     parentName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
     gradeLevel: { type: String, required: true },
     phone: { type: String, required: true },
     gender: { type: String, required: true },
