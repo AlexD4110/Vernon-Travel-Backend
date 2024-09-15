@@ -36,8 +36,11 @@ router.post('/register', async (req, res) => {
         state: req.body.state,
         zip: req.body.zip
       },
-      emergencyContact: req.body.emergencyContact,
-    });
+       // Pass the separate fields for emergency contact
+    emergencyContactName: req.body.emergencyContactName,
+    emergencyContactNumber: req.body.emergencyContactNumber,
+    registrationDate: new Date()
+});
     
     const newPlayer = await player.save();
     res.status(201).json(newPlayer);
@@ -81,8 +84,11 @@ router.patch('/:id', getPlayer, async (req, res) => {
   if (req.body.zip != null) {
     res.player.address.zip = req.body.zip;
   }
-  if (req.body.emergencyContact != null) {
-    res.player.emergencyContact = req.body.emergencyContact;
+  if (req.body.emergencyContactName != null) {
+    res.player.emergencyContactName = req.body.emergencyContactName;
+  }
+  if (req.body.emergencyContactNumber != null) {
+    res.player.emergencyContactNumber = req.body.emergencyContactNumber;
   }
   
   try {

@@ -65,6 +65,8 @@ const server = app.listen(PORT, () => {
    console.log(`Server running on port ${PORT}`);
 });
 
+console.log(`Environment: ${process.env.NODE_ENV}`);
+
 // Graceful shutdown
 process.on('SIGTERM', () => {
    console.log('SIGTERM received: closing HTTP server');

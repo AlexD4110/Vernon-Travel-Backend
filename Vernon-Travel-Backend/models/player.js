@@ -15,7 +15,9 @@ const playerSchema = new Schema({
         state: { type: String, required: true },
         zip: { type: String, required: true }
     },
-    emergencyContact: { type: String, required: true },
+    // Update emergencyContact to two separate fields
+    emergencyContactName: { type: String, required: true },
+    emergencyContactNumber: { type: String, required: true },
     registrationDate: { type: Date, default: Date.now } // Automatically set when registering
 });
 
