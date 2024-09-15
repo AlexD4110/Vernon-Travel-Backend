@@ -68,13 +68,17 @@ const server = app.listen(PORT, () => {
 console.log(`Environment: ${process.env.NODE_ENV}`);
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
    console.log('SIGTERM received: closing HTTP server');
-   server.close(() => {
+   server.close(async () => {
       console.log('HTTP server closed');
-      mongoose.connection.close(false, () => {
+      try {
+         await mongoose.connection.close(false); // No callback needed
          console.log('MongoDB connection closed');
          process.exit(0);
-      });
+      } catch (err) {
+         console.error('Error closing MongoDB connection', err);
+         process.exit(1);
+      }
    });
 });
