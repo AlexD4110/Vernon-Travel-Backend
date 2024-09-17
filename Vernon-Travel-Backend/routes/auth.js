@@ -2,6 +2,8 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const Player = require('../models/player'); 
 const router = express.Router();
+const transporter = require('../mailer');
+const nodemailer = require('nodemailer'); // Import nodemailer to use getTestMessageUrl
 
 // Get all registered players
 router.get('/', async (req, res) => {
@@ -21,7 +23,7 @@ router.get('/:id', getPlayer, (req, res) => {
 // Register (Create) a new player
 router.post('/register', async (req, res) => {
   try {
-    
+    // Create a new player instance
     const player = new Player({
       playerFirstName: req.body.playerFirstName,
       playerLastName: req.body.playerLastName,
@@ -34,23 +36,56 @@ router.post('/register', async (req, res) => {
         street: req.body.street,
         town: req.body.town,
         state: req.body.state,
-        zip: req.body.zip
+        zip: req.body.zip,
       },
-       // Pass the separate fields for emergency contact
-    emergencyContactName: req.body.emergencyContactName,
-    emergencyContactNumber: req.body.emergencyContactNumber,
-    registrationDate: new Date()
-});
-    
+      emergencyContactName: req.body.emergencyContactName,
+      emergencyContactNumber: req.body.emergencyContactNumber,
+      registrationDate: new Date(),
+    });
+
+    // Save the player to the database
     const newPlayer = await player.save();
-    res.status(201).json(newPlayer);
+
+    // Prepare the email content
+    const mailOptions = {
+      from: 'Vernon Travel Basketball" <no-reply@example.com>',
+      to: req.body.email,
+      subject: 'Registration Confirmation',
+      text: `Dear ${req.body.parentName},
+  
+  Thank you for registering ${req.body.playerFirstName} ${req.body.playerLastName} for the Vernon Travel Basketball tryouts!
+  
+  We have received your registration details. We will be putting out more information over the next couple of weeks.
+  
+  Best regards,
+  Vernon Travel Basketball`,
+    };
+  
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent successfully');
+      console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
+      return res.status(201).json({
+        message: 'Registration successful, confirmation email sent.',
+        previewUrl: nodemailer.getTestMessageUrl(info),
+        player: newPlayer,
+      });
+    } catch (error) {
+      console.error('Error sending email:', error);
+      return res.status(201).json({
+        message: 'Registration successful, but failed to send confirmation email.',
+        player: newPlayer,
+      });
+    }
   } catch (err) {
+    console.error('Error during registration:', err);
     res.status(400).json({ message: err.message });
   }
 });
 
 // Update player details
 router.patch('/:id', getPlayer, async (req, res) => {
+  // Update fields if provided
   if (req.body.playerFirstName != null) {
     res.player.playerFirstName = req.body.playerFirstName;
   }
@@ -90,7 +125,7 @@ router.patch('/:id', getPlayer, async (req, res) => {
   if (req.body.emergencyContactNumber != null) {
     res.player.emergencyContactNumber = req.body.emergencyContactNumber;
   }
-  
+
   try {
     const updatedPlayer = await res.player.save();
     res.json(updatedPlayer);
