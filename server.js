@@ -1,0 +1,77 @@
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config(); // Load environment variables
+const enforce = require('express-sslify');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const { supabase } = require('./db-connection');
+
+
+// Initialize Express app
+const app = express();
+
+// Use JSON parser middleware required for body parsing
+app.use(express.json());
+
+// CORS configuration
+const corsOptions = {
+   origin: process.env.NODE_ENV === 'production' ? 'https://vernontravellbasketball.org' : 'http://localhost:5173',
+   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+};
+app.use(cors(corsOptions));
+
+// Security: Helmet to set various HTTP headers for protection
+app.use(helmet({
+   contentSecurityPolicy: {
+     directives: {
+       defaultSrc: ["'self'"],
+       imgSrc: ["'self'", 'https:'], // Allow images to load from your domain and https sources
+       scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts (if necessary, be careful with this)
+       objectSrc: ["'none'"], // Disallow Flash, etc.
+     },
+   },
+}));
+
+// Enforce HTTPS only in production
+if (process.env.NODE_ENV === 'production') {
+   app.use(enforce.HTTPS({ trustProtoHeader: true }));
+   console.log('Enforcing HTTPS');
+} else {
+   console.log('Running in development mode');
+}
+
+// Set trust proxy
+app.set('trust proxy', 1); // Trust first proxy
+
+// Rate limiting to prevent brute-force attacks
+const limiter = rateLimit({
+   windowMs: 15 * 60 * 1000, // 15 minutes
+   max: 100, // Limit each IP to 100 requests per windowMs
+   message: "Too many requests from this IP, please try again later."
+});
+app.use(limiter);
+
+app.locals.supabase = supabase;
+console.log('Supabase client initialized');
+
+// Import Routes
+const authRoutes = require('./routes/auth');
+app.use('/auth', authRoutes);
+
+// Start the Server and listen on the defined PORT
+const PORT = process.env.PORT || 5134;
+const server = app.listen(PORT, () => {
+   console.log(`Server running on port ${PORT}`);
+});
+
+console.log(`Environment: ${process.env.NODE_ENV}`);
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+   console.log('SIGTERM received: closing HTTP server');
+   server.close(async () => {
+      console.log('HTTP server closed');
+      // Supabase client does not maintain persistent connections that require closing.
+      process.exit(0);
+   });
+});

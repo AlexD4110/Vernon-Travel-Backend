@@ -1,0 +1,112 @@
+# Register a New Player - Successful Registration
+
+POST http://localhost:5134/auth/register
+Content-Type: application/json
+
+{
+  "playerFirstName": "John",
+  "playerLastName": "Doe",
+  "parentName": "Jane Doe",
+  "email": "jane.doe@example.com",
+  "gradeLevel": "5th Grade",
+  "phone": "555-1234",
+  "gender": "Male",
+  "street": "123 Main St",
+  "town": "Anytown",
+  "state": "CA",
+  "zip": "12345",
+  "emergencyContactName": "Jim Smith",
+  "emergencyContactNumber": "555-5678"
+}
+
+###
+
+# Register a New Player - Missing Required Field (email)
+
+POST http://localhost:5134/auth/register
+Content-Type: application/json
+
+{
+  "playerFirstName": "Alice",
+  "playerLastName": "Smith",
+  "parentName": "Bob Smith",
+  "gradeLevel": "6th Grade",
+  "phone": "555-9876",
+  "gender": "Female",
+  "street": "456 Elm St",
+  "town": "Othertown",
+  "state": "NY",
+  "zip": "67890",
+  "emergencyContactName": "Carol Johnson",
+  "emergencyContactNumber": "555-4321"
+}
+
+###
+
+# Register a New Player - Invalid Email Format
+
+POST http://localhost:5134/auth/register
+Content-Type: application/json
+
+{
+  "playerFirstName": "Tom",
+  "playerLastName": "Brown",
+  "parentName": "Sara Brown",
+  "email": "invalid-email-format",
+  "gradeLevel": "7th Grade",
+  "phone": "555-2468",
+  "gender": "Male",
+  "street": "789 Oak St",
+  "town": "Sometown",
+  "state": "TX",
+  "zip": "13579",
+  "emergencyContactName": "Linda Green",
+  "emergencyContactNumber": "555-8642"
+}
+
+###
+
+# Get All Registered Players
+
+GET http://localhost:5134/auth/
+
+###
+
+# Get a Player by ID
+
+# Replace {playerId} with an actual player ID from your database
+GET http://localhost:5134/auth/{playerId}
+
+###
+
+# Update a Player's Details
+
+# Replace {playerId} with an actual player ID from your database
+PATCH http://localhost:5134/auth/{playerId}
+Content-Type: application/json
+
+{
+  "gradeLevel": "8th Grade",
+  "phone": "555-0000"
+}
+
+###
+
+# Delete a Player
+
+# Replace {playerId} with an actual player ID from your database
+DELETE http://localhost:5134/auth/{playerId}
+
+###
+
+# Test Email Sending Separately
+
+# This requires an additional route in your server code
+POST http://localhost:5134/auth/test-email
+Content-Type: application/json
+
+{
+  "email": "your-email@example.com"
+}
+
+###
